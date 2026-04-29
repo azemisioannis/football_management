@@ -2,9 +2,11 @@ using Microsoft.AspNetCore.Mvc;
 using Dapper;
 using System.Data;
 using FootballApi.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FootballApi.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class LeagueController : ControllerBase
