@@ -1005,11 +1005,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\giann\\Desktop\\football_management\\FootballApi\\FootballApi.csproj",
+      "projectUniqueName": "C:\\Users\\giann\\football_management\\FootballApi\\FootballApi.csproj",
       "projectName": "FootballApi",
-      "projectPath": "C:\\Users\\giann\\Desktop\\football_management\\FootballApi\\FootballApi.csproj",
+      "projectPath": "C:\\Users\\giann\\football_management\\FootballApi\\FootballApi.csproj",
       "packagesPath": "C:\\Users\\giann\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\giann\\Desktop\\football_management\\FootballApi\\obj\\",
+      "outputPath": "C:\\Users\\giann\\football_management\\FootballApi\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\giann\\AppData\\Roaming\\NuGet\\NuGet.Config"
