@@ -6,7 +6,7 @@ function LeagueList({ leagues, onDelete }) {
     const [page, setPage] = useState(1);
     const itemsPerPage = 5;
 
-    // Διόρθωση σελίδας αν διαγραφεί το τελευταίο στοιχείο
+    // Προσαρμογή σελίδας pagination σε περίπτωση διαγραφής στοιχείων
     useEffect(() => {
         const totalPages = Math.ceil(leagues.length / itemsPerPage);
         if (page > totalPages && totalPages > 0) {
@@ -14,15 +14,18 @@ function LeagueList({ leagues, onDelete }) {
         }
     }, [leagues.length, page]);
 
+    // Διαχείριση αλλαγής σελίδας και scroll στην κορυφή
     const handlePageChange = (event, value) => {
         setPage(value);
         window.scrollTo(0, 0);
     };
 
+    // Υπολογισμός των στοιχείων που θα προβληθούν στην τρέχουσα σελίδα
     const indexOfLastItem = page * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentLeagues = leagues.slice(indexOfFirstItem, indexOfLastItem);
 
+    // Προβολή μηνύματος σε περίπτωση άδειας λίστας
     if (leagues.length === 0) {
         return (
             <Paper sx={{ p: 5, textAlign: 'center', bgcolor: '#fafafa', border: '1px dashed #ccc' }}>

@@ -9,6 +9,7 @@ const RoleSelector = ({ value, onChange }) => {
             <Typography variant="body2" sx={{ mb: 1, fontWeight: 'bold', color: '#555', textAlign: 'center' }}>
                 ΕΓΓΡΑΦΗ ΩΣ:
             </Typography>
+            {/* Toggle group για την επιλογή μεταξύ Manager ομάδας ή Διοργανωτή λίγκας */}
             <ToggleButtonGroup
                 value={value}
                 exclusive

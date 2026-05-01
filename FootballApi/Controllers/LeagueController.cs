@@ -18,6 +18,7 @@ public class LeagueController : ControllerBase
         _db = db;
     }
 
+    // Ανάκτηση όλων των διοργανώσεων
     [HttpGet]
     public async Task<ActionResult<IEnumerable<League>>> GetAllLeagues()
     {
@@ -26,6 +27,7 @@ public class LeagueController : ControllerBase
         return Ok(leagues);
     }
 
+    // Ανάκτηση διοργάνωσης βάσει ID
     [HttpGet("{id}")]
     public async Task<ActionResult<League>> GetLeagueById(int id)
     {
@@ -35,15 +37,17 @@ public class LeagueController : ControllerBase
         return Ok(league);
     }
 
+    // Προσθήκη νέας διοργάνωσης
     [HttpPost]
     public async Task<ActionResult<League>> AddLeague([FromBody] League league)
-{
-    var sql = "INSERT INTO leagues (name, region, user_id) VALUES (@Name, @Region, @UserId) RETURNING id;";
-    var newId = await _db.QuerySingleAsync<int>(sql, league);
-    league.Id = newId;
-    return Ok(league);
-}
+    {
+        var sql = "INSERT INTO leagues (name, region, user_id) VALUES (@Name, @Region, @UserId) RETURNING id;";
+        var newId = await _db.QuerySingleAsync<int>(sql, league);
+        league.Id = newId;
+        return Ok(league);
+    }
 
+    // Διαγραφή διοργάνωσης βάσει ID
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteLeague(int id)
     {
@@ -53,17 +57,12 @@ public class LeagueController : ControllerBase
         return NoContent();
     }
 
-   [HttpGet("user/{userId}")]
+    // Ανάκτηση διοργανώσεων συγκεκριμένου χρήστη
+    [HttpGet("user/{userId}")]
     public async Task<ActionResult<IEnumerable<League>>> GetUserLeagues(int userId)
-{
-    // Φέρνουμε όλες τις λίγκες που ανήκουν σε αυτόν τον χρήστη
-    var sql = "SELECT id AS Id, name AS Name, region AS Region, user_id AS UserId FROM leagues WHERE user_id = @userId";
-    
-    var leagues = await _db.QueryAsync<League>(sql, new { userId });
-    
-    // Επιστρέφουμε τη λίστα (έστω και άδεια [])
-    return Ok(leagues);
-}
-
-
+    {
+        var sql = "SELECT id AS Id, name AS Name, region AS Region, user_id AS UserId FROM leagues WHERE user_id = @userId";
+        var leagues = await _db.QueryAsync<League>(sql, new { userId });
+        return Ok(leagues);
+    }
 }

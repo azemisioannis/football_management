@@ -4,11 +4,12 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { deleteLeague } from '../../../services/api';
 
 function LeagueManager({ league, onDelete }) {
+    // Διαχείριση διαγραφής διοργάνωσης μέσω API
     const handleDelete = async () => {
         if (window.confirm(`Είστε σίγουροι ότι θέλετε να διαγράψετε τη λίγκα "${league.Name || league.name}";`)) {
             try {
                 await deleteLeague(league.Id || league.id);
-                onDelete(); // Καλεί την ανανέωση της λίστας στο Dashboard
+                onDelete(); // Ενημέρωση της λίστας στο γονικό component
             } catch (error) {
                 console.error("Delete Error:", error);
                 alert("Σφάλμα κατά τη διαγραφή.");

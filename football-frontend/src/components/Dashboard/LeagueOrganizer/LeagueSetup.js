@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { TextField, Button, Typography, Paper, Box, Stack } from '@mui/material';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import { jwtDecode } from 'jwt-decode'; // Χρειάζεται για το UserId
-import API from '../../../services/api'; // Σιγουρέψου για το σωστό path
+import { jwtDecode } from 'jwt-decode'; 
+import API from '../../../services/api'; 
 
 function LeagueSetup({ onLeagueCreated }) {
     const [leagueData, setLeagueData] = useState({ 
@@ -10,33 +10,34 @@ function LeagueSetup({ onLeagueCreated }) {
         region: '' 
     });
 
+    // Ενημέρωση των πεδίων της φόρμας
     const handleChange = (e) => {
         const { name, value } = e.target;
         setLeagueData({ ...leagueData, [name]: value });
     };
 
+    // Υποβολή δεδομένων και δημιουργία νέας λίγκας
     const handleSubmit = async (e) => {
         e.preventDefault();
         
         try {
-            // 1. Παίρνουμε το token και αποκωδικοποιούμε το UserId
+            // Ανάκτηση και αποκωδικοποίηση UserId από το JWT Token
             const token = localStorage.getItem('token');
             if (!token) return;
             
             const decoded = jwtDecode(token);
             const userId = decoded.userId;
 
-            // 2. Προετοιμάζουμε το αντικείμενο για το Backend (προσέχουμε τα κεφαλαία/πεζά αν χρειάζεται)
+            // Προετοιμασία αντικειμένου για αποστολή στο Backend
             const finalData = {
                 name: leagueData.name,
                 region: leagueData.region,
                 userId: userId
             };
 
-            // 3. Στέλνουμε το POST request
             await API.post('/league', finalData);
             
-            // 4. Ενημερώνουμε το Dashboard να κάνει refresh και να αλλάξει view
+            // Callback για ανανέωση του Dashboard και αλλαγή view
             onLeagueCreated(); 
             
         } catch (error) {

@@ -17,37 +17,39 @@ function Register() {
         role: 'team_manager'
     });
 
+    // Ενημέρωση των πεδίων της φόρμας εγγραφής
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
+    // Ενημέρωση του επιλεγμένου ρόλου
     const handleRoleChange = (event, newRole) => {
         if (newRole !== null) setFormData({ ...formData, role: newRole });
     };
 
+   // Διαχείριση υποβολής της εγγραφής και έλεγχος κωδικών
    const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Επιβεβαίωση ταυτοποίησης κωδικών πρόσβασης
     if (formData.password !== formData.confirmPassword) {
         alert("Οι κωδικοί δεν ταιριάζουν!");
         return;
     }
 
-    // Αν η βάση σου περιμένει "league_organizer" αντί για "league",
-    // στέλνουμε απευθείας το role από το state μας.
+    // Προετοιμασία δεδομένων εγγραφής για το API
     const registerData = {
         UserName: formData.username,
         Password: formData.password,
-        Role: formData.role // Εδώ θα στείλει "league_organizer" ή "team_manager"
+        Role: formData.role 
     };
 
     try {
         await register(registerData);
         alert("Η εγγραφή έγινε επιτυχώς!");
-        navigate('/');
+        navigate('/'); // Ανακατεύθυνση στη σελίδα login
     } catch (error) {
-        // Εδώ τυπώνουμε το σφάλμα για να ξέρουμε τι φταίει
         console.error("Registration Error:", error.response?.data);
         alert(error.response?.data || "Σφάλμα στην εγγραφή.");
     }
@@ -59,6 +61,7 @@ function Register() {
             alignItems: 'center', justifyContent: 'center',
             backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover',
             position: 'relative',
+            // Ημιπερατό layer για βελτίωση της αντίθεσης του περιεχομένου
             "&::before": { 
                 content: '""', 
                 position: 'absolute', 

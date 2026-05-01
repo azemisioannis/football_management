@@ -13,7 +13,7 @@ const RegisterForm = ({ formData, handleChange, handleRoleChange, handleSubmit }
                 Δημιουργία Λογαριασμού
             </Typography>
 
-            {/* Χρήση του RoleSelector */}
+            {/* Επιλογή ρόλου χρήστη (Manager ή Διοργανωτής) */}
             <RoleSelector value={formData.role} onChange={handleRoleChange} />
 
             <TextField
@@ -59,6 +59,7 @@ const RegisterForm = ({ formData, handleChange, handleRoleChange, handleSubmit }
                 ΟΛΟΚΛΗΡΩΣΗ ΕΓΓΡΑΦΗΣ
             </Button>
 
+            {/* Πλοήγηση πίσω στη σελίδα σύνδεσης */}
             <Box sx={{ textAlign: 'center', mt: 2 }}>
                 <Typography variant="body2" sx={{ color: '#555' }}>
                     Έχετε ήδη λογαριασμό;{" "}

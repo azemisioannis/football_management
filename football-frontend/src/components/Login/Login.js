@@ -13,15 +13,18 @@ function Login() {
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
+    // Διαδικασία υποβολής της φόρμας και αυθεντικοποίησης χρήστη
     const handleSubmit = async (e) => {
         e.preventDefault();
         const loginData = { UserName: username, Password: password };
 
         try {
+            // Κλήση API για σύνδεση και αποθήκευση του token
             const response = await login(loginData);
             const token = response.data.token;
             localStorage.setItem('token', token);
 
+            // Αποκωδικοποίηση ρόλου χρήστη και ανακατεύθυνση στο Dashboard
             const decoded = jwtDecode(token);
             const role = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
             localStorage.setItem('role', role);
@@ -40,6 +43,7 @@ function Login() {
             backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover',
             backgroundPosition: 'center',
             position: 'relative',
+            // Overlay για τη βελτίωση της αναγνωσιμότητας πάνω από το background
             "&::before": { 
                 content: '""', position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, 
                 backgroundColor: 'rgba(255, 255, 255, 0.85)', zIndex: 1 
@@ -85,7 +89,7 @@ function Login() {
                             ΣΥΝΔΕΣΗ
                         </Button>
 
-                        {/* ΕΔΩ ΕΙΝΑΙ ΑΥΤΟ ΠΟΥ ΕΛΕΙΠΕ */}
+                        {/* Σύνδεσμος εγγραφής νέου μέλους */}
                         <Box sx={{ textAlign: 'center', mt: 2 }}>
                             <Typography variant="body2" sx={{ color: '#555' }}>
                                 Δεν έχετε λογαριασμό;{" "}

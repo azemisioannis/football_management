@@ -8,20 +8,19 @@ function TeamSetup({ onTeamCreated }) {
         city: ''
     });
 
+    // Διαχείριση αλλαγών στα πεδία εισαγωγής της ομάδας
     const handleChange = (e) => {
         setTeamData({ ...teamData, [e.target.name]: e.target.value });
     };
 
+    // Διαχείριση υποβολής της φόρμας και ενημέρωση του γονικού component
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        // Εδώ θα μπει η κλήση στο API αργότερα:
-        // const response = await createTeam(teamData);
-        
+        // Μελλοντική υλοποίηση κλήσης API για δημιουργία ομάδας
         console.log("Δεδομένα για το Table 'teams':", teamData);
         
-        // Ειδοποιούμε τον "πατέρα" (Dashboard) ότι η ομάδα φτιάχτηκε
-        // Του στέλνουμε ένα mock id για να ξεκλειδώσει το PlayerManager
+        // Ενημέρωση Dashboard με προσωρινά δεδομένα (mock id)
         onTeamCreated({ id: 99, ...teamData }); 
     };
 

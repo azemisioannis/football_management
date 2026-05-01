@@ -4,7 +4,7 @@ import {
 } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
-// Icons
+// Εισαγωγή εικονιδίων για τα πεδία εισαγωγής
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import PersonIcon from '@mui/icons-material/Person';
 
@@ -15,6 +15,7 @@ const LoginForm = ({ formData, handleChange, handleLogin }) => {
                 Καλώς ήρθατε
             </Typography>
 
+            {/* Πεδίο εισαγωγής ονόματος χρήστη με εικονίδιο */}
             <TextField
                 margin="dense" 
                 required 
@@ -33,6 +34,7 @@ const LoginForm = ({ formData, handleChange, handleLogin }) => {
                 }}
             />
 
+            {/* Πεδίο εισαγωγής κωδικού πρόσβασης */}
             <TextField
                 margin="dense" 
                 required 
@@ -67,6 +69,7 @@ const LoginForm = ({ formData, handleChange, handleLogin }) => {
                 ΕΙΣΟΔΟΣ
             </Button>
 
+            {/* Σύνδεσμος προς τη σελίδα εγγραφής νέου χρήστη */}
             <Box sx={{ textAlign: 'center', mt: 2 }}>
                 <Typography variant="body2" sx={{ color: '#555' }}>
                     Δεν έχετε λογαριασμό;{" "}

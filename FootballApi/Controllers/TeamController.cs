@@ -18,15 +18,16 @@ public class TeamController : ControllerBase
         _db = db;
     }
 
+    // Ανάκτηση όλων των ομάδων
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Team>>> GetAllTeams()
     {
-        
         var sql = "SELECT id AS Id, name AS Name, city AS City, league_id AS LeagueId, user_id AS UserId, created_at AS CreatedAt FROM teams";
         var teams = await _db.QueryAsync<Team>(sql);
         return Ok(teams);
     }
 
+    // Ανάκτηση ομάδας βάσει ID
     [HttpGet("{id}")]
     public async Task<ActionResult<Team>> GetTeamById(int id)
     {
@@ -36,22 +37,22 @@ public class TeamController : ControllerBase
         return Ok(team);
     }
 
+    // Δημιουργία νέας ομάδας
     [HttpPost]
-public async Task<ActionResult> AddTeam([FromBody] Team team)
-{
-    
-    var sql = @"INSERT INTO teams (name, city, league_id, user_id, created_at) 
-                VALUES (@Name, @City, NULLIF(@LeagueId, 0), @UserId, CURRENT_TIMESTAMP) 
-                RETURNING id;";
+    public async Task<ActionResult> AddTeam([FromBody] Team team)
+    {
+        var sql = @"INSERT INTO teams (name, city, league_id, user_id, created_at) 
+                    VALUES (@Name, @City, NULLIF(@LeagueId, 0), @UserId, CURRENT_TIMESTAMP) 
+                    RETURNING id;";
 
-    try 
-    {
-        var newId = await _db.QueryFirstAsync<int>(sql, team);
-        return Ok(new { id = newId, message = "Success" });
+        try 
+        {
+            var newId = await _db.QueryFirstAsync<int>(sql, team);
+            return Ok(new { id = newId, message = "Success" });
+        }
+        catch (Exception ex) 
+        {
+            return BadRequest(ex.Message);
+        }
     }
-    catch (Exception ex) 
-    {
-        return BadRequest(ex.Message);
-    }
-}
 }

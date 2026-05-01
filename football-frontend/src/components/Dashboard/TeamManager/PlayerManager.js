@@ -15,24 +15,25 @@ function PlayerManager({ teamId }) {
         position: 'GK' 
     });
 
+    // Ενημέρωση των στοιχείων του υπό δημιουργία παίκτη
     const handleChange = (e) => {
         setNewPlayer({ ...newPlayer, [e.target.name]: e.target.value });
     };
 
+    // Προσθήκη παίκτη στη λίστα και reset της φόρμας
     const handleAddPlayer = (e) => {
         e.preventDefault();
-        // Εδώ θα γίνει το API call: POST /players
-        // Στέλνουμε: { ...newPlayer, team_id: teamId }
+        // Μελλοντική υλοποίηση API call: POST /players
         
-        const playerWithId = { ...newPlayer, id: Date.now() }; // Προσωρινό ID
+        const playerWithId = { ...newPlayer, id: Date.now() }; 
         setPlayers([...players, playerWithId]);
         
-        // Reset τη φόρμα
         setNewPlayer({ first_name: '', last_name: '', position: 'GK' });
     };
 
+    // Αφαίρεση παίκτη από το τρέχον state
     const handleDelete = (id) => {
-        // Εδώ θα γίνει το API call: DELETE /players/:id
+        // Μελλοντική υλοποίηση API call: DELETE /players/:id
         setPlayers(players.filter(p => p.id !== id));
     };
 
@@ -80,7 +81,7 @@ function PlayerManager({ teamId }) {
                 </Box>
             </Paper>
 
-            {/* Πίνακας Παικτών */}
+            {/* Πίνακας Προβολής Ρόστερ */}
             <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
                 <Table>
                     <TableHead sx={{ bgcolor: '#f5f5f5' }}>

@@ -5,6 +5,7 @@ import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
 const LoginHeader = () => {
     return (
         <Box sx={{ zIndex: 2, mb: 4, textAlign: 'center' }}>
+            {/* Κεντρικός τίτλος εφαρμογής με gradient και εικονίδια μπάλας */}
             <Typography 
                 variant="h2" 
                 sx={{ 
@@ -19,7 +20,7 @@ const LoginHeader = () => {
                     WebkitBackgroundClip: 'text', 
                     WebkitTextFillColor: 'transparent',
                     fontSize: { xs: '2.2rem', md: '4rem' },
-                    // Το animation περιστροφής
+                    // Εφέ περιστροφής των εικονιδίων στο hover
                     '&:hover svg': { 
                         transform: 'rotate(360deg)', 
                         transition: '1s' 
@@ -55,7 +56,7 @@ const LoginHeader = () => {
                 />
             </Typography>
 
-            {/* Η μικρή πράσινη γραμμή κάτω από τον τίτλο */}
+            {/* Διακοσμητική γραμμή κάτω από τον τίτλο */}
             <Box 
                 sx={{ 
                     width: '80px', 
