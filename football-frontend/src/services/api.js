@@ -24,7 +24,12 @@ export const login = (formData) => API.post('/auth/login', formData);
 // Συνάρτηση για Register
 export const register = (formData) => API.post('/auth/register', formData);
 
+export const updateLeague = (id, leagueData) => {
+    return API.put(`/league/${id}`, leagueData);};
+
 // Παράδειγμα για League (θα το χρειαστούμε μετά)
 export const createLeague = (leagueData) => API.post('/league', leagueData);
+
+
 
 export default API;

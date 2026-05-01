@@ -65,4 +65,25 @@ public class LeagueController : ControllerBase
         var leagues = await _db.QueryAsync<League>(sql, new { userId });
         return Ok(leagues);
     }
+
+    // Ενημέρωση υπάρχουσας διοργάνωσης
+[HttpPut("{id}")]
+public async Task<IActionResult> UpdateLeague(int id, [FromBody] League leagueData)
+{
+    var sql = "UPDATE leagues SET name = @Name, region = @Region WHERE id = @id";
+    
+    // Εκτέλεση της ενημέρωσης με χρήση του ID από το URL και των δεδομένων από το Body
+    var rowsAffected = await _db.ExecuteAsync(sql, new { 
+        Name = leagueData.Name, 
+        Region = leagueData.Region, 
+        id = id 
+    });
+
+    if (rowsAffected == 0) 
+        return NotFound($"Η Λίγκα με ID: {id} δεν βρέθηκε!");
+
+    return Ok(new { message = "Η ενημέρωση ολοκληρώθηκε επιτυχώς!" });
+}
+
+    
 }
