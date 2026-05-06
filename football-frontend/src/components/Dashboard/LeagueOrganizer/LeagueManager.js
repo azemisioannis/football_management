@@ -4,12 +4,13 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
+import GroupsIcon from '@mui/icons-material/Groups';
 import { deleteLeague, updateLeague } from '../../../services/api';
 /**
  * Component για τη διαχείριση μιας συγκεκριμένης διοργάνωσης.
  * Παρέχει λειτουργίες προβολής, επεξεργασίας και διαγραφής.
  */
-function LeagueManager({ league, onDelete }) {
+function LeagueManager({ league, onDelete, onViewTeams }) {
     // Κατάσταση λειτουργίας (viewing ή editing)
     const [isEditing, setIsEditing] = useState(false);
     
@@ -142,6 +143,17 @@ function LeagueManager({ league, onDelete }) {
                             >
                                 Διαγραφή
                             </Button>
+
+                            <Button 
+                                variant="contained" 
+                                size="small" 
+                                color="success" 
+                                startIcon={<GroupsIcon />} 
+                                onClick={() => onViewTeams(league)} 
+                                sx={{ mr: 1, fontWeight: 'bold' }}
+                            >
+                                ΟΜΑΔΕΣ
+                            </Button>
                         </>
                     )}
                 </Box>
@@ -151,9 +163,9 @@ function LeagueManager({ league, onDelete }) {
             
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="body2" sx={{ fontStyle: 'italic', color: '#666' }}>
-                    Εγγεγραμμένες ομάδες: 0
+                    Εγγεγραμμένες ομάδες: {league.teamsCount || league.TeamsCount || 0}
                 </Typography>
-                {/* Μελλοντική προσθήκη ημερομηνίας ή status */}
+                {}
             </Box>
         </Paper>
     );

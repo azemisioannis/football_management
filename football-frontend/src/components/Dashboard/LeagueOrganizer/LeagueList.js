@@ -3,7 +3,7 @@ import { Box, Typography, Paper } from '@mui/material';
 import LeagueManager from './LeagueManager';
 import PaginationComponent from '../../Common/PaginationComponent';
 
-function LeagueList({ leagues, onDelete }) {
+function LeagueList({ leagues, onDelete, onViewTeams }) {
     const [page, setPage] = useState(1);
     const itemsPerPage = 5;
 
@@ -38,7 +38,7 @@ function LeagueList({ leagues, onDelete }) {
             </Typography>
 
             {currentLeagues.map((league) => (
-                <LeagueManager key={league.Id || league.id} league={league} onDelete={onDelete} />
+                <LeagueManager key={league.Id || league.id} league={league} onDelete={onDelete} onViewTeams={onViewTeams} />
             ))}
 
             <PaginationComponent 

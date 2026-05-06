@@ -59,31 +59,39 @@ public class LeagueController : ControllerBase
 
     // Ανάκτηση διοργανώσεων συγκεκριμένου χρήστη
     [HttpGet("user/{userId}")]
-    public async Task<ActionResult<IEnumerable<League>>> GetUserLeagues(int userId)
-    {
-        var sql = "SELECT id AS Id, name AS Name, region AS Region, user_id AS UserId FROM leagues WHERE user_id = @userId";
-        var leagues = await _db.QueryAsync<League>(sql, new { userId });
-        return Ok(leagues);
-    }
+public async Task<ActionResult<IEnumerable<League>>> GetUserLeagues(int userId)
+{
+    // Χρησιμοποιούμε LEFT JOIN για να μετρήσουμε πόσες ομάδες έχουν το ID αυτής της λίγκας
+    var sql = @"
+        SELECT l.id AS Id, l.name AS Name, l.region AS Region, l.user_id AS UserId, 
+               COUNT(t.id) AS TeamsCount
+        FROM leagues l
+        LEFT JOIN teams t ON l.id = t.league_id
+        WHERE l.user_id = @userId
+        GROUP BY l.id, l.name, l.region, l.user_id";
+
+    var leagues = await _db.QueryAsync<League>(sql, new { userId });
+    return Ok(leagues);
+}
 
     // Ενημέρωση υπάρχουσας διοργάνωσης
-[HttpPut("{id}")]
-public async Task<IActionResult> UpdateLeague(int id, [FromBody] League leagueData)
-{
-    var sql = "UPDATE leagues SET name = @Name, region = @Region WHERE id = @id";
-    
-    // Εκτέλεση της ενημέρωσης με χρήση του ID από το URL και των δεδομένων από το Body
-    var rowsAffected = await _db.ExecuteAsync(sql, new { 
-        Name = leagueData.Name, 
-        Region = leagueData.Region, 
-        id = id 
-    });
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateLeague(int id, [FromBody] League leagueData)
+    {
+        var sql = "UPDATE leagues SET name = @Name, region = @Region WHERE id = @id";
+        
+        // Εκτέλεση της ενημέρωσης με χρήση του ID από το URL και των δεδομένων από το Body
+        var rowsAffected = await _db.ExecuteAsync(sql, new { 
+            Name = leagueData.Name, 
+            Region = leagueData.Region, 
+            id = id 
+        });
 
-    if (rowsAffected == 0) 
-        return NotFound($"Η Λίγκα με ID: {id} δεν βρέθηκε!");
+        if (rowsAffected == 0) 
+            return NotFound($"Η Λίγκα με ID: {id} δεν βρέθηκε!");
 
-    return Ok(new { message = "Η ενημέρωση ολοκληρώθηκε επιτυχώς!" });
-}
+        return Ok(new { message = "Η ενημέρωση ολοκληρώθηκε επιτυχώς!" });
+    }
 
     
 }

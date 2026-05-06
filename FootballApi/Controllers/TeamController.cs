@@ -72,4 +72,25 @@ public class TeamController : ControllerBase
         if (rowsAffected == 0) return NotFound();
             return NoContent();
     }
+
+    [HttpPut("{teamId}/join-league/{leagueId}")]
+    public async Task<IActionResult> JoinLeague(int teamId, int leagueId)
+    {
+        // Ενημερώνουμε τη στήλη league_id στον πίνακα teams
+        var sql = "UPDATE teams SET league_id = @leagueId WHERE id = @teamId";
+        
+        var rowsAffected = await _db.ExecuteAsync(sql, new { teamId, leagueId });
+        
+        if (rowsAffected == 0) return NotFound();
+        
+        return Ok(new { message = "Η ομάδα συνδέθηκε επιτυχώς!" });
+    }
+
+    [HttpGet("league/{leagueId}")]
+    public async Task<ActionResult<IEnumerable<Team>>> GetTeamsByLeague(int leagueId)
+    {
+        var sql = "SELECT id, name, city FROM teams WHERE league_id = @leagueId";
+        var teams = await _db.QueryAsync<Team>(sql, new { leagueId });
+        return Ok(teams);
+    }
 }

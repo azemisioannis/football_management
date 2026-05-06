@@ -8,38 +8,53 @@ import Sidebar from '../Layout/Sidebar';
 import Navbar from '../Layout/Navbar';
 import LeagueSetup from './LeagueOrganizer/LeagueSetup';
 import LeagueList from './LeagueOrganizer/LeagueList'; 
+import LeagueTeamsList from './LeagueOrganizer/LeagueTeamsList';
 import TeamList from './TeamManager/TeamList';
 import TeamSetup from './TeamManager/TeamSetup';
 import PlayerManager from './TeamManager/PlayerManager';
 
 function Dashboard() {
     const navigate = useNavigate();
-    const [leagues, setLeagues] = useState([]);
-    const [teams, setTeams] = useState([]); // State για τις ομάδες του Manager
-    const [selectedTeam, setSelectedTeam] = useState(null); // Η ομάδα που επιλέγεται για διαχείριση ρόστερ
+    
+    // States για δεδομένα
+    const [leagues, setLeagues] = useState([]); // Λίγκες του συγκεκριμένου Organizer
+    const [allLeagues, setAllLeagues] = useState([]); // Όλες οι λίγκες (για χρήση από Manager)
+    const [teams, setTeams] = useState([]); // Ομάδες του συγκεκριμένου Manager
+    
+    // States για επιλογή και πλοήγηση
+    const [selectedTeam, setSelectedTeam] = useState(null); 
+    const [selectedLeague, setSelectedLeague] = useState(null);
     const [userRole, setUserRole] = useState(null);
     const [loading, setLoading] = useState(true);
     const [view, setView] = useState(''); 
 
-    // Ανάκτηση των διοργανώσεων που ανήκουν στον συγκεκριμένο χρήστη από το API
+    // Ανάκτηση των λιγκών του Organizer
     const fetchLeagues = async (userId) => {
         try {
             const response = await API.get(`/league/user/${userId}`);
             setLeagues(response.data);
         } catch (error) {
-            console.error("Error:", error);
-            setLeagues([]); 
+            console.error("Error fetching user leagues:", error);
         }
     };
 
-    // Ανάκτηση των ομάδων που ανήκουν στον συγκεκριμένο Manager
+    // Ανάκτηση ΟΛΩΝ των λιγκών (για το dropdown του Manager)
+    const fetchAllLeagues = async () => {
+        try {
+            const response = await API.get('/league');
+            setAllLeagues(response.data);
+        } catch (error) {
+            console.error("Error fetching all leagues:", error);
+        }
+    };
+
+    // Ανάκτηση των ομάδων του Manager
     const fetchTeams = async (userId) => {
         try {
             const response = await API.get(`/team/user/${userId}`);
             setTeams(response.data);
         } catch (error) {
             console.error("Error fetching teams:", error);
-            setTeams([]);
         }
     };
 
@@ -55,30 +70,29 @@ function Dashboard() {
         }
     };
 
-    // Έλεγχος αυθεντικοποίησης και ανάκτηση ρόλου χρήστη κατά το mount του component
+    // Αρχικός έλεγχος Role και φόρτωση δεδομένων
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (!token) { navigate('/'); return; }
         try {
             const decoded = jwtDecode(token);
-            // Εξαγωγή του ρόλου από τα claims του JWT
             const role = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
             setUserRole(role);
             
-            // Καθορισμός αρχικού view και φόρτωση δεδομένων βάσει ρόλου
             if (role === 'league_organizer') {
                 setView('my_leagues');
                 fetchLeagues(decoded.userId);
             } else if (role === 'team_manager') {
                 setView('my_teams');
                 fetchTeams(decoded.userId);
+                fetchAllLeagues();
             }
             
             setLoading(false);
         } catch (e) { navigate('/'); }
     }, [navigate]);
 
-    // Χειροκίνητη ανανέωση των δεδομένων μετά από ενέργειες (π.χ. δημιουργία ή διαγραφή)
+    // Συνάρτηση ανανέωσης δεδομένων
     const refreshData = () => {
         const token = localStorage.getItem('token');
         if (!token) return;
@@ -88,10 +102,10 @@ function Dashboard() {
             fetchLeagues(decoded.userId);
         } else if (userRole === 'team_manager') {
             fetchTeams(decoded.userId);
+            fetchAllLeagues();
         }
     };
 
-    // Προβολή loading spinner κατά τη διάρκεια της αρχικής φόρτωσης
     if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}><CircularProgress color="success" /></Box>;
 
     return (
@@ -103,44 +117,51 @@ function Dashboard() {
             <Box component="main" sx={{ flexGrow: 1, p: 4, minHeight: '100vh' }}>
                 <Toolbar />
 
-                {/* Περιβάλλον League Organizer */}
+                {/* --- SECTION: LEAGUE ORGANIZER --- */}
                 {userRole === 'league_organizer' && (
                     <>
-                        {/* Προβολή λίστας διοργανώσεων */}
                         {view === 'my_leagues' && (
-                            <LeagueList leagues={leagues} onDelete={refreshData} />
+                            <LeagueList 
+                                leagues={leagues} 
+                                onDelete={refreshData} 
+                                onViewTeams={(league) => {
+                                    setSelectedLeague(league);
+                                    setView('view_league_teams');
+                                }}
+                            />
                         )}
                         
-                        {/* Φόρμα δημιουργίας νέας διοργανώσης */}
-                            {view === 'add_league' && (
-                                <Box sx={{ 
-                                    display: 'flex', 
-                                    justifyContent: 'center', 
-                                    alignItems: 'center', 
-                                    minHeight: '70vh' // Αυτό θα το φέρει στο κέντρο καθ' ύψος
-                                }}>
-                                    <LeagueSetup onLeagueCreated={() => { refreshData(); setView('my_leagues'); }} />
-                                </Box>
-                            )}
+                        {view === 'view_league_teams' && (
+                            <LeagueTeamsList 
+                                league={selectedLeague} 
+                                onBack={() => setView('my_leagues')} 
+                            />
+                        )}
+
+                        {view === 'add_league' && (
+                            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '70vh' }}>
+                                <LeagueSetup onLeagueCreated={() => { refreshData(); setView('my_leagues'); }} />
+                            </Box>
+                        )}
                     </>
                 )}
 
-                {/* Περιβάλλον Team Manager */}
+                {/* --- SECTION: TEAM MANAGER --- */}
                 {userRole === 'team_manager' && (
                     <>
-                        {/* Λίστα Ομάδων */}
                         {view === 'my_teams' && (
                             <TeamList 
                                 teams={teams} 
+                                allLeagues={allLeagues} 
                                 onManagePlayers={(team) => {
                                     setSelectedTeam(team);
                                     setView('manage_roster');
                                 }} 
                                 onDeleteTeam={handleDeleteTeam}
+                                refreshData={refreshData}
                             />
                         )}
 
-                        {/* Διαχείριση Ρόστερ συγκεκριμένης ομάδας */}
                         {view === 'manage_roster' && (
                             <Box>
                                 <Button 
@@ -154,16 +175,12 @@ function Dashboard() {
                                 <Typography variant="h4" sx={{ mb: 1, fontWeight: 'bold' }}>
                                     {selectedTeam?.Name || selectedTeam?.name}
                                 </Typography>
-                                <Typography variant="subtitle1" color="textSecondary" sx={{ mb: 4 }}>
-                                    Διαχείριση Παικτών και Ρόστερ
-                                </Typography>
                                 <PlayerManager teamId={selectedTeam?.Id || selectedTeam?.id} />
                             </Box>
                         )}
 
-                        {/* Δημιουργία Νέας Ομάδας */}
                         {view === 'add_team' && (
-                            <Box sx={{ maxWidth: 600, mx: 'auto' }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '70vh' }}>
                                 <TeamSetup onTeamCreated={() => { refreshData(); setView('my_teams'); }} />
                             </Box>
                         )}
