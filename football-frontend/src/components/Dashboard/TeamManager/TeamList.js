@@ -14,10 +14,9 @@ function TeamList({ teams, allLeagues, onManagePlayers, onDeleteTeam, refreshDat
     const [page, setPage] = useState(1);
     const itemsPerPage = 5;
     
-    // State για να κρατάμε ποια λίγκα επιλέχθηκε για κάθε ομάδα (π.χ. { teamId: leagueId })
+    // State για την επιλογή λίγκας ανά ομάδα
     const [selectedLeagues, setSelectedLeagues] = useState({});
 
-    // Επαναφορά σελίδας αν η τρέχουσα σελίδα μείνει κενή μετά από διαγραφή
     useEffect(() => {
         const totalPages = Math.ceil(teams.length / itemsPerPage);
         if (page > totalPages && totalPages > 0) {
@@ -25,7 +24,6 @@ function TeamList({ teams, allLeagues, onManagePlayers, onDeleteTeam, refreshDat
         }
     }, [teams.length, page]);
 
-    // Σύνάρτηση για τη σύνδεση της ομάδας με τη λίγκα
     const handleJoinLeague = async (teamId) => {
         const leagueId = selectedLeagues[teamId];
         if (!leagueId) {
@@ -34,10 +32,9 @@ function TeamList({ teams, allLeagues, onManagePlayers, onDeleteTeam, refreshDat
         }
 
         try {
-            // Κλήση στο νέο Put endpoint που έφτιαξες
             await API.put(`/team/${teamId}/join-league/${leagueId}`);
-            alert("Η ομάδα συνδέθηκε επιτυχώς!");
-            refreshData(); // Ανανέωση των δεδομένων στο Dashboard
+            alert("Η ομάδα συνδέθηκε επιτυχώς στη λίγκα!");
+            refreshData();
         } catch (error) {
             console.error("Error joining league:", error);
             alert("Σφάλμα κατά τη σύνδεση στη λίγκα.");
@@ -49,10 +46,33 @@ function TeamList({ teams, allLeagues, onManagePlayers, onDeleteTeam, refreshDat
         window.scrollTo(0, 0);
     };
 
-    // Υπολογισμός στοιχείων σελίδας
     const indexOfLastItem = page * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentTeams = teams.slice(indexOfFirstItem, indexOfLastItem);
+
+    // ΕΛΕΓΧΟΣ ΓΙΑ ΑΔΕΙΑ ΛΙΣΤΑ (Το "όμορφο" πλαίσιο που ζήτησες)
+    if (!teams || teams.length === 0) {
+        return (
+            <Box>
+                <Typography variant="h4" sx={{ mb: 4, fontWeight: 'bold', color: '#1b5e20' }}>
+                    Οι Ομάδες μου
+                </Typography>
+                <Paper 
+                    sx={{ 
+                        p: 5, 
+                        textAlign: 'center', 
+                        bgcolor: '#fafafa', 
+                        border: '1px dashed #ccc',
+                        borderRadius: 2 
+                    }}
+                >
+                    <Typography color="textSecondary" variant="body1">
+                        Δεν έχετε καταχωρίσει ακόμα κάποια ομάδα.
+                    </Typography>
+                </Paper>
+            </Box>
+        );
+    }
 
     return (
         <Box>
@@ -76,7 +96,6 @@ function TeamList({ teams, allLeagues, onManagePlayers, onDeleteTeam, refreshDat
                                     Πόλη: {team.City || team.city}
                                 </Typography>
 
-                                {/* --- ΕΝΟΤΗΤΑ ΣΥΝΔΕΣΗΣ ΜΕ ΛΙΓΚΑ --- */}
                                 {(!team.LeagueId && !team.league_id) ? (
                                     <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                                         <FormControl size="small" sx={{ minWidth: 200 }}>
@@ -126,7 +145,6 @@ function TeamList({ teams, allLeagues, onManagePlayers, onDeleteTeam, refreshDat
                                 )}
                             </Box>
 
-                            {/* --- ΚΟΥΜΠΙΑ ΕΝΕΡΓΕΙΩΝ --- */}
                             <Box sx={{ display: 'flex', gap: 1 }}>
                                 <Button 
                                     variant="contained" 
