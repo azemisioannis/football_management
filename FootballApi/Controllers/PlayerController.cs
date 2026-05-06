@@ -61,4 +61,16 @@ public class PlayerController : ControllerBase
 
         return NoContent();
     }
+
+    // Ανάκτηση όλων των παικτών που ανήκουν σε μια συγκεκριμένη ομάδα
+[HttpGet("team/{teamId}")]
+public async Task<ActionResult<IEnumerable<Player>>> GetPlayersByTeam(int teamId)
+{
+    // Χρησιμοποιούμε Aliasing για να ταιριάζουν τα ονόματα με το μοντέλο Player.cs
+    var sql = "SELECT id, first_name AS FirstName, last_name AS LastName, position AS Position, team_id AS TeamId FROM players WHERE team_id = @teamId";
+    
+    var players = await _db.QueryAsync<Player>(sql, new { teamId });
+    
+    return Ok(players);
+}
 }

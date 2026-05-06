@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Paper, Stack, Pagination } from '@mui/material';
+import { Box, Typography, Paper } from '@mui/material';
 import LeagueManager from './LeagueManager';
+import PaginationComponent from '../../Common/PaginationComponent';
 
 function LeagueList({ leagues, onDelete }) {
     const [page, setPage] = useState(1);
     const itemsPerPage = 5;
 
-    // Προσαρμογή σελίδας pagination σε περίπτωση διαγραφής στοιχείων
     useEffect(() => {
         const totalPages = Math.ceil(leagues.length / itemsPerPage);
         if (page > totalPages && totalPages > 0) {
@@ -14,24 +14,19 @@ function LeagueList({ leagues, onDelete }) {
         }
     }, [leagues.length, page]);
 
-    // Διαχείριση αλλαγής σελίδας και scroll στην κορυφή
     const handlePageChange = (event, value) => {
         setPage(value);
         window.scrollTo(0, 0);
     };
 
-    // Υπολογισμός των στοιχείων που θα προβληθούν στην τρέχουσα σελίδα
     const indexOfLastItem = page * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentLeagues = leagues.slice(indexOfFirstItem, indexOfLastItem);
 
-    // Προβολή μηνύματος σε περίπτωση άδειας λίστας
     if (leagues.length === 0) {
         return (
             <Paper sx={{ p: 5, textAlign: 'center', bgcolor: '#fafafa', border: '1px dashed #ccc' }}>
-                <Typography color="textSecondary">
-                    Δεν έχετε καταχωρίσει ακόμα κάποια λίγκα.
-                </Typography>
+                <Typography color="textSecondary">Δεν έχετε καταχωρίσει ακόμα κάποια λίγκα.</Typography>
             </Paper>
         );
     }
@@ -43,24 +38,14 @@ function LeagueList({ leagues, onDelete }) {
             </Typography>
 
             {currentLeagues.map((league) => (
-                <LeagueManager 
-                    key={league.Id || league.id} 
-                    league={league} 
-                    onDelete={onDelete} 
-                />
+                <LeagueManager key={league.Id || league.id} league={league} onDelete={onDelete} />
             ))}
 
-            {leagues.length > itemsPerPage && (
-                <Stack spacing={2} sx={{ mt: 4, alignItems: 'center' }}>
-                    <Pagination 
-                        count={Math.ceil(leagues.length / itemsPerPage)} 
-                        page={page} 
-                        onChange={handlePageChange} 
-                        color="success" 
-                        size="large"
-                    />
-                </Stack>
-            )}
+            <PaginationComponent 
+                count={Math.ceil(leagues.length / itemsPerPage)} 
+                page={page} 
+                onChange={handlePageChange} 
+            />
         </Box>
     );
 }

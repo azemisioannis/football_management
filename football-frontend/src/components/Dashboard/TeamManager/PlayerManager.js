@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
     Box, Paper, Typography, Table, TableBody, TableCell, 
     TableContainer, TableHead, TableRow, Button, TextField, 
-    Select, MenuItem, IconButton, InputLabel, FormControl 
+    Select, MenuItem, InputLabel, FormControl 
 } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import API from '../../../services/api';
+import PlayerRow from './PlayerRow'; // Εισαγωγή του νέου component
 
+/**
+ * Διαχείριση ρόστερ και προσθήκη παικτών για μια συγκεκριμένη ομάδα.
+ */
 function PlayerManager({ teamId }) {
     const [players, setPlayers] = useState([]);
     const [newPlayer, setNewPlayer] = useState({
@@ -15,34 +19,63 @@ function PlayerManager({ teamId }) {
         position: 'GK' 
     });
 
-    // Ενημέρωση των στοιχείων του υπό δημιουργία παίκτη
+    // Φόρτωση των παικτών της ομάδας από το Backend
+    useEffect(() => {
+        if (teamId) fetchPlayers();
+    }, [teamId]);
+
+    const fetchPlayers = async () => {
+        try {
+            // Κλήση στο API για ανάκτηση παικτών βάσει TeamId
+            const response = await API.get(`/player/team/${teamId}`);
+            setPlayers(response.data);
+        } catch (error) {
+            console.error("Error fetching players:", error);
+        }
+    };
+
     const handleChange = (e) => {
         setNewPlayer({ ...newPlayer, [e.target.name]: e.target.value });
     };
 
-    // Προσθήκη παίκτη στη λίστα και reset της φόρμας
-    const handleAddPlayer = (e) => {
+    // Αποστολή νέου παίκτη στο Backend
+    const handleAddPlayer = async (e) => {
         e.preventDefault();
-        // Μελλοντική υλοποίηση API call: POST /players
-        
-        const playerWithId = { ...newPlayer, id: Date.now() }; 
-        setPlayers([...players, playerWithId]);
-        
-        setNewPlayer({ first_name: '', last_name: '', position: 'GK' });
+        try {
+            const playerData = {
+                FirstName: newPlayer.first_name,
+                LastName: newPlayer.last_name,
+                Position: newPlayer.position,
+                TeamId: teamId
+            };
+
+            await API.post('/player', playerData);
+            setNewPlayer({ first_name: '', last_name: '', position: 'GK' });
+            fetchPlayers(); // Ανανέωση πίνακα
+        } catch (error) {
+            console.error("Error adding player:", error);
+            alert("Σφάλμα κατά την προσθήκη του παίκτη.");
+        }
     };
 
-    // Αφαίρεση παίκτη από το τρέχον state
-    const handleDelete = (id) => {
-        // Μελλοντική υλοποίηση API call: DELETE /players/:id
-        setPlayers(players.filter(p => p.id !== id));
+    // Διαγραφή παίκτη μέσω API
+    const handleDelete = async (id) => {
+        if (window.confirm("Είστε σίγουροι για τη διαγραφή του παίκτη;")) {
+            try {
+                await API.delete(`/player/${id}`);
+                fetchPlayers(); // Ανανέωση πίνακα
+            } catch (error) {
+                console.error("Error deleting player:", error);
+            }
+        }
     };
 
     return (
         <Box>
-            {/* Φόρμα Προσθήκης Παίκτη */}
+            {/* Φόρμα Εισαγωγής */}
             <Paper elevation={2} sx={{ p: 3, mb: 4, borderRadius: 3 }}>
                 <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <PersonAddIcon color="success" /> Προσθήκη Νέου Παίκτη
+                    <PersonAddIcon color="success" /> Προσθήκη Παίκτη
                 </Typography>
                 <Box component="form" onSubmit={handleAddPlayer} sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                     <TextField
@@ -69,10 +102,10 @@ function PlayerManager({ teamId }) {
                             label="Θέση"
                             onChange={handleChange}
                         >
-                            <MenuItem value="GK">GK (Τερματοφύλακας)</MenuItem>
-                            <MenuItem value="DF">DF (Αμυντικός)</MenuItem>
-                            <MenuItem value="MF">MF (Μέσος)</MenuItem>
-                            <MenuItem value="FW">FW (Επιθετικός)</MenuItem>
+                            <MenuItem value="GK">GK</MenuItem>
+                            <MenuItem value="DF">DF</MenuItem>
+                            <MenuItem value="MF">MF</MenuItem>
+                            <MenuItem value="FW">FW</MenuItem>
                         </Select>
                     </FormControl>
                     <Button type="submit" variant="contained" color="success">
@@ -81,13 +114,12 @@ function PlayerManager({ teamId }) {
                 </Box>
             </Paper>
 
-            {/* Πίνακας Προβολής Ρόστερ */}
+            {/* Πίνακας Παικτών */}
             <TableContainer component={Paper} sx={{ borderRadius: 3 }}>
                 <Table>
                     <TableHead sx={{ bgcolor: '#f5f5f5' }}>
                         <TableRow>
-                            <TableCell><strong>Όνομα</strong></TableCell>
-                            <TableCell><strong>Επίθετο</strong></TableCell>
+                            <TableCell><strong>Ονοματεπώνυμο</strong></TableCell>
                             <TableCell><strong>Θέση</strong></TableCell>
                             <TableCell align="right"><strong>Ενέργειες</strong></TableCell>
                         </TableRow>
@@ -95,22 +127,17 @@ function PlayerManager({ teamId }) {
                     <TableBody>
                         {players.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={4} align="center" sx={{ py: 3 }}>
-                                    Δεν υπάρχουν παίκτες στο ρόστερ.
+                                <TableCell colSpan={3} align="center" sx={{ py: 3 }}>
+                                    Το ρόστερ είναι άδειο.
                                 </TableCell>
                             </TableRow>
                         ) : (
                             players.map((player) => (
-                                <TableRow key={player.id} hover>
-                                    <TableCell>{player.first_name}</TableCell>
-                                    <TableCell>{player.last_name}</TableCell>
-                                    <TableCell>{player.position}</TableCell>
-                                    <TableCell align="right">
-                                        <IconButton color="error" onClick={() => handleDelete(player.id)}>
-                                            <DeleteIcon />
-                                        </IconButton>
-                                    </TableCell>
-                                </TableRow>
+                                <PlayerRow 
+                                    key={player.id || player.Id} 
+                                    player={player} 
+                                    onDelete={handleDelete} 
+                                />
                             ))
                         )}
                     </TableBody>

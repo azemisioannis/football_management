@@ -1,56 +1,55 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography, Paper, Box, Stack } from '@mui/material';
+import { Paper, TextField, Button, Typography, Box } from '@mui/material';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import { jwtDecode } from 'jwt-decode'; 
-import API from '../../../services/api'; 
+import { jwtDecode } from 'jwt-decode';
+import API from '../../../services/api';
 
 function LeagueSetup({ onLeagueCreated }) {
-    const [leagueData, setLeagueData] = useState({ 
-        name: '', 
-        region: '' 
+    const [leagueData, setLeagueData] = useState({
+        name: '',
+        region: ''
     });
 
     // Ενημέρωση των πεδίων της φόρμας
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setLeagueData({ ...leagueData, [name]: value });
+        setLeagueData({ ...leagueData, [e.target.name]: e.target.value });
     };
 
-    // Υποβολή δεδομένων και δημιουργία νέας λίγκας
+    // Υποβολή δεδομένων και αποθήκευση στη βάση
     const handleSubmit = async (e) => {
         e.preventDefault();
         
         try {
-            // Ανάκτηση και αποκωδικοποίηση UserId από το JWT Token
             const token = localStorage.getItem('token');
             if (!token) return;
             
             const decoded = jwtDecode(token);
             const userId = decoded.userId;
 
-            // Προετοιμασία αντικειμένου για αποστολή στο Backend
-            const finalData = {
-                name: leagueData.name,
-                region: leagueData.region,
-                userId: userId
+            // Δεδομένα για το API (Με κεφαλαία για το Dapper στο Backend)
+            const payload = {
+                Name: leagueData.name,
+                Region: leagueData.region,
+                UserId: userId
             };
 
-            await API.post('/league', finalData);
+            const response = await API.post('/league', payload);
             
-            // Callback για ανανέωση του Dashboard και αλλαγή view
-            onLeagueCreated(); 
+            // Ενημέρωση του Dashboard και επιστροφή στη λίστα
+            onLeagueCreated(response.data); 
             
         } catch (error) {
             console.error("Error creating league:", error);
-            alert("Κάτι πήγε στραβά κατά τη δημιουργία της λίγκας.");
+            alert("Σφάλμα κατά τη δημιουργία. Το όνομα της λίγκας υπάρχει ήδη.");
         }
     };
 
     return (
-        <Paper elevation={4} sx={{ p: 4, mt: 5, borderRadius: 4, maxWidth: 500, mx: 'auto' }}>
+        <Paper elevation={3} sx={{ p: 4, borderRadius: 4, maxWidth: 400, width: '100%' }}>
+            {/* Κεφαλίδα με εικονίδιο και τίτλο */}
             <Box sx={{ textAlign: 'center', mb: 3 }}>
-                <EmojiEventsIcon sx={{ fontSize: 60, color: '#fbc02d' }} />
-                <Typography variant="h5" sx={{ fontWeight: 'bold', mt: 1 }}>
+                <EmojiEventsIcon sx={{ fontSize: 50, color: '#fbc02d', mb: 1 }} />
+                <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>
                     Νέα Λίγκα
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
@@ -58,38 +57,38 @@ function LeagueSetup({ onLeagueCreated }) {
                 </Typography>
             </Box>
 
+            {/* Φόρμα Δημιουργίας */}
             <form onSubmit={handleSubmit}>
-                <Stack spacing={3}>
-                    <TextField
-                        fullWidth
-                        label="Όνομα Λίγκας"
-                        name="name"
-                        value={leagueData.name}
-                        onChange={handleChange}
-                        required
-                    />
-                    <TextField
-                        fullWidth
-                        label="Περιοχή (Region)"
-                        name="region"
-                        value={leagueData.region}
-                        onChange={handleChange}
-                        required
-                    />
-                    <Button 
-                        type="submit" 
-                        variant="contained" 
-                        size="large"
-                        sx={{ 
-                            bgcolor: '#1b5e20', 
-                            py: 1.5, 
-                            fontWeight: 'bold',
-                            '&:hover': { bgcolor: '#2e7d32' }
-                        }}
-                    >
-                        ΔΗΜΙΟΥΡΓΙΑ
-                    </Button>
-                </Stack>
+                <TextField
+                    fullWidth
+                    label="Όνομα Λίγκας"
+                    name="name"
+                    variant="outlined"
+                    value={leagueData.name}
+                    onChange={handleChange}
+                    required
+                    sx={{ mb: 2 }}
+                />
+                <TextField
+                    fullWidth
+                    label="Περιοχή (Region)"
+                    name="region"
+                    variant="outlined"
+                    value={leagueData.region}
+                    onChange={handleChange}
+                    required
+                    sx={{ mb: 3 }}
+                />
+                <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    color="success"
+                    size="large"
+                    sx={{ py: 1.5, fontWeight: 'bold' }}
+                >
+                    ΔΗΜΙΟΥΡΓΙΑ
+                </Button>
             </form>
         </Paper>
     );

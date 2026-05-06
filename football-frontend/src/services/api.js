@@ -27,6 +27,10 @@ export const register = (formData) => API.post('/auth/register', formData);
 export const updateLeague = (id, leagueData) => {
     return API.put(`/league/${id}`, leagueData);};
 
+ export const getPlayersByTeam = (teamId) => {
+    return API.get(`/player/team/${teamId}`);
+};
+
 // Παράδειγμα για League (θα το χρειαστούμε μετά)
 export const createLeague = (leagueData) => API.post('/league', leagueData);
 

@@ -37,6 +37,14 @@ public class TeamController : ControllerBase
         return Ok(team);
     }
 
+    [HttpGet("user/{userId}")] 
+    public async Task<ActionResult<IEnumerable<Team>>> GetUserTeams(int userId)
+    {
+        var sql = "SELECT id AS Id, name AS Name, city AS City, user_id AS UserId, league_id AS LeagueId FROM teams WHERE user_id = @userId";
+        var teams = await _db.QueryAsync<Team>(sql, new { userId });
+        return Ok(teams);
+    }
+
     // Δημιουργία νέας ομάδας
     [HttpPost]
     public async Task<ActionResult> AddTeam([FromBody] Team team)
@@ -54,5 +62,14 @@ public class TeamController : ControllerBase
         {
             return BadRequest(ex.Message);
         }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteTeam(int id)
+    {
+        var sql = "DELETE FROM teams WHERE id = @id";
+        var rowsAffected = await _db.ExecuteAsync(sql, new { id });
+        if (rowsAffected == 0) return NotFound();
+            return NoContent();
     }
 }
