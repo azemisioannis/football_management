@@ -30,10 +30,10 @@ The solution is organized into three main layers:
 - Navigate to the `FootballApi` directory.
 - Update the connection string in `appsettings.json` to match your local database credentials.
 - Run the following commands:
-  dotnet restore
+  dotnet restore,
   dotnet run
 ### 3. Frontend Configuration
 - Navigate to the `Football-frontend` directory.
 - Install the required dependancies and start the development server: 
-    npm install
+    npm install,
     npm start
